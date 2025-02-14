@@ -1,6 +1,6 @@
-# Custom Shell Implementation
+# Shell Implementation
 
-This is a simple shell program written in Java as part of the Codecrafters challenge.
+This is a simple shell program written in Java 
 
 ## Features
 - Supports `cd`, `pwd`, `exit`, `type` commands.
