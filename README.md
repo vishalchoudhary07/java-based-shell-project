@@ -15,3 +15,9 @@ A lightweight and extensible command-line shell built in Java. This shell mimics
 ❌ Graceful handling of invalid commands and paths
 
 🔧 Easily extensible for more commands
+## Technologies Used
+Java 22 – Core programming language used to build the shell
+
+Java I/O (java.io.*) – For file and directory handling (type, cd)
+
+Java NIO (java.nio.file.*) – For efficient path resolution (optional)
