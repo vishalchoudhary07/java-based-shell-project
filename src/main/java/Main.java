@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList; // Import ArrayList
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,6 +16,9 @@ public class Main {
         Path currentPath = Paths.get("");
         String pwd = currentPath.toAbsolutePath().toString();
         Scanner scanner = new Scanner(System.in);
+        
+        // 1. Create the history storage
+        List<String> history = new ArrayList<>();
 
         repl:
         while (true) {
@@ -22,9 +26,13 @@ public class Main {
             if (!scanner.hasNextLine()) break;
             
             String input = scanner.nextLine();
-            // Use our new Parser class
-            List<String> commands = CommandParser.parse(input);
             
+            // 2. Save command to history (ignore empty lines)
+            if (!input.trim().isEmpty()) {
+                history.add(input);
+            }
+
+            List<String> commands = CommandParser.parse(input);
             if (commands.isEmpty()) continue;
             
             String command = commands.get(0);
@@ -33,13 +41,12 @@ public class Main {
                 Builtin builtin = Builtin.valueOf(command);
                 switch (builtin) {
                     case exit:
-                        if (commands.size() == 1 || "0".equals(commands.get(1))) 
-                            break repl;
-                            break;
-                            
+                        if (commands.size() == 1 || "0".equals(commands.get(1))) break repl;
+                        break;
+                    
                     case echo:
                         if (commands.size() > 1) {
-                             System.out.println(String.join(" ", commands.subList(1, commands.size())));
+                            System.out.println(String.join(" ", commands.subList(1, commands.size())));
                         } else {
                             System.out.println();
                         }
@@ -56,9 +63,11 @@ public class Main {
                             else System.out.printf("%s: not found%n", target);
                         }
                         break;
+
                     case pwd:
                         System.out.println(pwd);
                         break;
+
                     case cd:
                         if (commands.size() < 2) break;
                         try {
@@ -78,6 +87,7 @@ public class Main {
                             System.out.printf("cd: %s: No such file or directory%n", commands.get(1));
                         }
                         break;
+
                     case cat:
                         if (commands.size() < 2) break;
                         Path fileToRead = Paths.get(pwd, commands.get(1));
@@ -88,9 +98,15 @@ public class Main {
                             System.out.println("cat: " + commands.get(1) + ": No such file");
                         }
                         break;
+                    
+                    // 3. Add the history command logic
+                    case history:
+                        for (int i = 0; i < history.size(); i++) {
+                            System.out.printf("%d %s%n", i + 1, history.get(i));
+                        }
+                        break;
                 }
             } else {
-                // Use our new Runner class
                 ProcessRunner.runExternal(commands, pwd, paths);
             }
         }
