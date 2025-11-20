@@ -4,11 +4,16 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList; // Import ArrayList
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    // ANSI Color Codes
+    public static final String GREEN = "\u001B[32m";
+    public static final String RESET = "\u001B[0m";
+    public static final String BLUE = "\u001B[34m";
+
     public static void main(String[] args) {
         String pathEnv = System.getenv("PATH");
         String[] paths = pathEnv.split(File.pathSeparator);
@@ -16,18 +21,18 @@ public class Main {
         Path currentPath = Paths.get("");
         String pwd = currentPath.toAbsolutePath().toString();
         Scanner scanner = new Scanner(System.in);
-        
-        // 1. Create the history storage
         List<String> history = new ArrayList<>();
 
         repl:
         while (true) {
-            System.out.print("$ ");
+            // UX Update: Short Prompt (Folder Name only)
+            // Gets the last part of the path (e.g., "java" instead of "C:\Users\...\java")
+            String folderName = Paths.get(pwd).getFileName().toString();
+            System.out.print(BLUE + folderName + " " + GREEN + "$ " + RESET);
+            
             if (!scanner.hasNextLine()) break;
             
             String input = scanner.nextLine();
-            
-            // 2. Save command to history (ignore empty lines)
             if (!input.trim().isEmpty()) {
                 history.add(input);
             }
@@ -43,7 +48,6 @@ public class Main {
                     case exit:
                         if (commands.size() == 1 || "0".equals(commands.get(1))) break repl;
                         break;
-                    
                     case echo:
                         if (commands.size() > 1) {
                             System.out.println(String.join(" ", commands.subList(1, commands.size())));
@@ -51,7 +55,6 @@ public class Main {
                             System.out.println();
                         }
                         break;
-
                     case type:
                         if (commands.size() < 2) break;
                         String target = commands.get(1);
@@ -63,11 +66,9 @@ public class Main {
                             else System.out.printf("%s: not found%n", target);
                         }
                         break;
-
                     case pwd:
                         System.out.println(pwd);
                         break;
-
                     case cd:
                         if (commands.size() < 2) break;
                         try {
@@ -87,7 +88,6 @@ public class Main {
                             System.out.printf("cd: %s: No such file or directory%n", commands.get(1));
                         }
                         break;
-
                     case cat:
                         if (commands.size() < 2) break;
                         Path fileToRead = Paths.get(pwd, commands.get(1));
@@ -98,11 +98,29 @@ public class Main {
                             System.out.println("cat: " + commands.get(1) + ": No such file");
                         }
                         break;
-                    
-                    // 3. Add the history command logic
                     case history:
                         for (int i = 0; i < history.size(); i++) {
                             System.out.printf("%d %s%n", i + 1, history.get(i));
+                        }
+                        break;
+                    case clear:
+                        System.out.print("\033[H\033[2J\033[3J");
+                        System.out.flush();
+                        break;
+                    
+                    // New Feature: ls command
+                    case ls:
+                        File dir = new File(pwd);
+                        File[] files = dir.listFiles();
+                        if (files != null) {
+                            for (File file : files) {
+                                if (file.isDirectory()) {
+                                    // Print directories in Blue with a trailing slash
+                                    System.out.println(BLUE + file.getName() + File.separator + RESET);
+                                } else {
+                                    System.out.println(file.getName());
+                                }
+                            }
                         }
                         break;
                 }

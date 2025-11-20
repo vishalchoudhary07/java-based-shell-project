@@ -5,5 +5,7 @@ public enum Builtin {
     cd,
     cat,
     echo,
-    history
+    history,
+    clear,
+    ls
 }
