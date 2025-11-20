@@ -33,8 +33,18 @@ public class Main {
                 Builtin builtin = Builtin.valueOf(command);
                 switch (builtin) {
                     case exit:
-                        if (commands.size() > 1 && "0".equals(commands.get(1))) break repl;
+                        if (commands.size() == 1 || "0".equals(commands.get(1))) 
+                            break repl;
+                            break;
+                            
+                    case echo:
+                        if (commands.size() > 1) {
+                             System.out.println(String.join(" ", commands.subList(1, commands.size())));
+                        } else {
+                            System.out.println();
+                        }
                         break;
+
                     case type:
                         if (commands.size() < 2) break;
                         String target = commands.get(1);

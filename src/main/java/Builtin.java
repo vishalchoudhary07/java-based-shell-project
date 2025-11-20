@@ -3,5 +3,6 @@ public enum Builtin {
     type,
     pwd,
     cd,
-    cat
+    cat,
+    echo
 }
